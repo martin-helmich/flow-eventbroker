@@ -2,12 +2,25 @@
 namespace Mw\EventBroker\Aspect;
 
 
+/*                                                                        *
+ * This script belongs to the TYPO3 Flow package "Mw.EventBroker".        *
+ *                                                                        *
+ * (C) 2014 Martin Helmich <typo3@martin-helmich.de>                      *
+ *                                                                        */
+
+
 use Mw\EventBroker\Broker\BrokerInterface;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Aop\JoinPointInterface;
 
 
 /**
+ * Aspect that publishes an event once an method with an "event" annotation has been called.
+ *
+ * @author     Martin Helmich <typo3@martin-helmich.de>
+ * @package    Mw\EventBroker
+ * @subpackage Aspect
+ *
  * @Flow\Aspect
  */
 class PublishingAspect
@@ -24,7 +37,11 @@ class PublishingAspect
 
 
     /**
-     * @param JoinPointInterface $joinPoint
+     * Publishes an event as soon as a method with an event annotation is called.
+     *
+     * @param JoinPointInterface $joinPoint The join point.
+     * @return void
+     *
      * @Flow\After("methodAnnotatedWith(Mw\EventBroker\Annotations\Event)")
      */
     public function publishEventAdvice(JoinPointInterface $joinPoint)
