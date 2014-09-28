@@ -1,7 +1,7 @@
 {
     "name": "mw/eventbroker",
     "type": "typo3-flow-package",
-    "description": "Add description here",
+    "description": "TYPO3 Flow package containing an event dispatching mechanism",
     "require": {
         "typo3/flow": "*"
     },
