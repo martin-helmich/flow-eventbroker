@@ -5,6 +5,18 @@
     "require": {
         "typo3/flow": "*"
     },
+    "authors": [
+        {
+            "name": "Martin Helmich",
+            "email": "typo3@martin-helmich.de",
+            "homepage": "https://github.com/martin-helmich",
+            "role": "Owner"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/martin-helmich/flow-eventbroker/issues",
+        "source": "https://github.com/martin-helmich/flow-eventbroker"
+    },
     "autoload": {
         "psr-0": {
             "Mw\\EventBroker": "Classes"
