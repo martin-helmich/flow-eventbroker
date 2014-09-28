@@ -50,6 +50,34 @@ class Broker implements BrokerInterface
 
     public function flush()
     {
+        if (FALSE === ($eventMap = $this->cache->get('DispatcherConfiguration')))
+        {
+            $eventMap = $this->buildEventMap();
+            $this->cache->set('DispatcherConfiguration', $eventMap);
+        }
+
+        foreach ($this->queue as $event)
+        {
+            $class     = get_class($event);
+            $listeners = $eventMap[$class];
+
+            foreach ($listeners as $listener)
+            {
+                list($class, $method) = $listener;
+
+                $listenerInstance = $this->objectManager->get($class);
+                $listenerInstance->{$method}($event);
+            }
+        }
+    }
+
+
+
+    /**
+     * @return array
+     */
+    private function buildEventMap()
+    {
         $eventMap = [];
 
         $annotation = 'Mw\\EventBroker\\Annotations\\Listener';
@@ -78,20 +106,7 @@ class Broker implements BrokerInterface
                 }
             }
         }
-
-        foreach ($this->queue as $event)
-        {
-            $class     = get_class($event);
-            $listeners = $eventMap[$class];
-
-            foreach ($listeners as $listener)
-            {
-                list($class, $method) = $listener;
-
-                $listenerInstance = $this->objectManager->get($class);
-                $listenerInstance->{$method}($event);
-            }
-        }
+        return $eventMap;
     }
 
 
