@@ -62,3 +62,9 @@ The event class to listen for is specified as parameter within the annotation.
 
         }
     }
+
+To-Do
+-----
+
+- Add unit test coverage
+- Provide mechanisms for asynchronous event processing
