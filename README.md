@@ -6,13 +6,9 @@ A simple event dispatching library for TYPO3 Flow.
 Installation
 ------------
 
-The package is not available on Packagist yet. Use the following setup in your
-composer manifest:
+The package is available on Packagist. Use the following setup in your composer manifest:
 
     {
-        "repositories": [
-            { "type": "vcs", "url": "ssh://github.com/martin-helmich/flow-eventbroker.git" }
-        ],
         "require": {
             "helmich/eventbroker": "*"
         }
