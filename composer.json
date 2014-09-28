@@ -1,9 +1,22 @@
 {
     "name": "mw/eventbroker",
     "type": "typo3-flow-package",
-    "description": "Add description here",
+    "license": "MIT",
+    "description": "TYPO3 Flow package containing an event dispatching mechanism",
     "require": {
         "typo3/flow": "*"
+    },
+    "authors": [
+        {
+            "name": "Martin Helmich",
+            "email": "typo3@martin-helmich.de",
+            "homepage": "https://github.com/martin-helmich",
+            "role": "Owner"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/martin-helmich/flow-eventbroker/issues",
+        "source": "https://github.com/martin-helmich/flow-eventbroker"
     },
     "autoload": {
         "psr-0": {
