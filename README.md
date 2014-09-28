@@ -10,7 +10,7 @@ The package is available on Packagist. Use the following setup in your composer 
 
     {
         "require": {
-            "helmich/eventbroker": "*"
+            "helmich/flow-eventbroker": "*"
         }
     }
 
