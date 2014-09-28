@@ -31,6 +31,12 @@ class Broker implements BrokerInterface
     protected $objectManager;
 
 
+    /**
+     * @var \TYPO3\Flow\Cache\Frontend\VariableFrontend
+     */
+    protected $cache;
+
+
     private $queue = [];
 
 
