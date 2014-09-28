@@ -42,7 +42,7 @@ class PublishingAspect
      * @param JoinPointInterface $joinPoint The join point.
      * @return void
      *
-     * @Flow\After("methodAnnotatedWith(Mw\EventBroker\Annotations\Event)")
+     * @Flow\After("methodAnnotatedWith(Helmich\EventBroker\Annotations\Event)")
      */
     public function publishEventAdvice(JoinPointInterface $joinPoint)
     {

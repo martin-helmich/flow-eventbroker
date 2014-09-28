@@ -91,9 +91,9 @@ class Broker implements BrokerInterface
 
             foreach ($listeners as $listener)
             {
-                list($class, $method) = $listener;
+                list($listenerClass, $method) = $listener;
 
-                $listenerInstance = $this->objectManager->get($class);
+                $listenerInstance = $this->objectManager->get($listenerClass);
                 $listenerInstance->{$method}($event);
             }
         }
@@ -110,20 +110,20 @@ class Broker implements BrokerInterface
     {
         $eventMap = [];
 
-        $annotation = 'Helmich\\EventBroker\\Annotations\\Listener';
-        $classes    = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotation);
+        $annotationName = 'Helmich\\EventBroker\\Annotations\\Listener';
+        $classes        = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotationName);
         foreach ($classes as $class)
         {
             $classReflection = new ClassReflection($class);
             /** @var MethodReflection $method */
             foreach ($classReflection->getMethods() as $method)
             {
-                if ($this->reflectionService->isMethodAnnotatedWith($class, $method->getName(), $annotation))
+                if ($this->reflectionService->isMethodAnnotatedWith($class, $method->getName(), $annotationName))
                 {
                     $annotation = $this->reflectionService->getMethodAnnotation(
                         $class,
                         $method->getName(),
-                        $annotation
+                        $annotationName
                     );
 
                     $event = $annotation->event;
