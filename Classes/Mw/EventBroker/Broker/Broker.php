@@ -2,6 +2,13 @@
 namespace Mw\EventBroker\Broker;
 
 
+/*                                                                        *
+ * This script belongs to the TYPO3 Flow package "Mw.EventBroker".        *
+ *                                                                        *
+ * (C) 2014 Martin Helmich <typo3@martin-helmich.de>                      *
+ *                                                                        */
+
+
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Object\ObjectManager;
 use TYPO3\Flow\Reflection\ClassReflection;
@@ -10,6 +17,12 @@ use TYPO3\Flow\Reflection\ReflectionService;
 
 
 /**
+ * Broker implementation that queues messages locally and publishes them on request.
+ *
+ * @author     Martin Helmich <typo3@martin-helmich.de>
+ * @package    Mw\EventBroker
+ * @subpackage Broker
+ *
  * @Flow\Scope("singleton")
  */
 class Broker implements BrokerInterface
@@ -33,14 +46,24 @@ class Broker implements BrokerInterface
 
     /**
      * @var \TYPO3\Flow\Cache\Frontend\VariableFrontend
+     * @Flow\Inject
      */
     protected $cache;
 
 
+    /**
+     * @var array
+     */
     private $queue = [];
 
 
 
+    /**
+     * Enqueues an arbitrary event.
+     *
+     * @param mixed $event The event object to publish.
+     * @return void
+     */
     public function queueEvent($event)
     {
         $this->queue[] = $event;
@@ -48,6 +71,11 @@ class Broker implements BrokerInterface
 
 
 
+    /**
+     * Publishes queued events.
+     *
+     * @return void
+     */
     public function flush()
     {
         if (FALSE === ($eventMap = $this->cache->get('DispatcherConfiguration')))
@@ -74,7 +102,9 @@ class Broker implements BrokerInterface
 
 
     /**
-     * @return array
+     * Builds the event dispatching configuration.
+     *
+     * @return array The event dispatching configuration.
      */
     private function buildEventMap()
     {
