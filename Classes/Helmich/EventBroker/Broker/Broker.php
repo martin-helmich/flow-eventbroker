@@ -87,7 +87,7 @@ class Broker implements BrokerInterface
         foreach ($this->queue as $event)
         {
             $class     = get_class($event);
-            $listeners = $eventMap[$class];
+            $listeners = array_key_exists($class, $eventMap) ? $eventMap[$class] : [];
 
             foreach ($listeners as $listener)
             {
