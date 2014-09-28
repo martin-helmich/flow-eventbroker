@@ -110,7 +110,7 @@ class Broker implements BrokerInterface
     {
         $eventMap = [];
 
-        $annotation = 'Mw\\EventBroker\\Annotations\\Listener';
+        $annotation = 'Helmich\\EventBroker\\Annotations\\Listener';
         $classes    = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotation);
         foreach ($classes as $class)
         {
