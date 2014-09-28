@@ -91,9 +91,9 @@ class Broker implements BrokerInterface
 
             foreach ($listeners as $listener)
             {
-                list($class, $method) = $listener;
+                list($listenerClass, $method) = $listener;
 
-                $listenerInstance = $this->objectManager->get($class);
+                $listenerInstance = $this->objectManager->get($listenerClass);
                 $listenerInstance->{$method}($event);
             }
         }
