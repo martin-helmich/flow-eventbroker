@@ -1,4 +1,4 @@
-Mw_EventBroker_Broker_DispatcherCache:
+Helmich_EventBroker_Broker_DispatcherCache:
   frontend: TYPO3\Flow\Cache\Frontend\VariableFrontend
   backend: TYPO3\Flow\Cache\Backend\FileBackend
   backendOptions:

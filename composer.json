@@ -1,5 +1,5 @@
 {
-    "name": "mw/eventbroker",
+    "name": "helmich/eventbroker",
     "type": "typo3-flow-package",
     "license": "MIT",
     "description": "TYPO3 Flow package containing an event dispatching mechanism",

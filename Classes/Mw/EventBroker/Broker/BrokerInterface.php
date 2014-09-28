@@ -1,12 +1,12 @@
 <?php
-namespace Mw\EventBroker\Broker;
+namespace Helmich\EventBroker\Broker;
 
 
 /**
  * Interface definition for a message broker.
  *
  * @author     Martin Helmich <typo3@martin-helmich.de>
- * @package    Mw\EventBroker
+ * @package    Helmich\EventBroker
  * @subpackage Annotations
  *
  * @api

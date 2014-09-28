@@ -14,7 +14,7 @@ composer manifest:
             { "type": "vcs", "url": "ssh://github.com/martin-helmich/flow-eventbroker.git" }
         ],
         "require": {
-            "mw/eventbroker": "*"
+            "helmich/eventbroker": "*"
         }
     }
 
@@ -28,7 +28,7 @@ Events are regular methods that are tagged with an `@Event\Event` annotation:
     <?php
     namespace My\Example;
 
-    use Mw\EventBroker\Annotations as Event;
+    use Helmich\EventBroker\Annotations as Event;
 
     class Emitter {
         public function doSomething() {
@@ -52,7 +52,7 @@ The event class to listen for is specified as parameter within the annotation.
     <?php
     namespace My\Example;
 
-    use Mw\EventBroker\Annotations as Event;
+    use Helmich\EventBroker\Annotations as Event;
 
     class Listener {
         /**

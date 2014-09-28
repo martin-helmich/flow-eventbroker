@@ -1,5 +1,5 @@
 <?php
-namespace Mw\EventBroker;
+namespace Helmich\EventBroker;
 
 
 use TYPO3\Flow\Core\Bootstrap;
@@ -19,7 +19,7 @@ class Package extends BasePackage
         $dispatcher->connect(
             'TYPO3\Flow\Mvc\Dispatcher',
             'afterControllerInvocation',
-            'Mw\EventBroker\Broker\BrokerInterface',
+            'Helmich\EventBroker\Broker\BrokerInterface',
             'flush'
         );
     }

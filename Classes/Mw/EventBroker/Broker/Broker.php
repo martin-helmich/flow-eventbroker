@@ -1,9 +1,9 @@
 <?php
-namespace Mw\EventBroker\Broker;
+namespace Helmich\EventBroker\Broker;
 
 
 /*                                                                        *
- * This script belongs to the TYPO3 Flow package "Mw.EventBroker".        *
+ * This script belongs to the TYPO3 Flow package "Helmich.EventBroker".   *
  *                                                                        *
  * (C) 2014 Martin Helmich <typo3@martin-helmich.de>                      *
  *                                                                        */
@@ -20,7 +20,7 @@ use TYPO3\Flow\Reflection\ReflectionService;
  * Broker implementation that queues messages locally and publishes them on request.
  *
  * @author     Martin Helmich <typo3@martin-helmich.de>
- * @package    Mw\EventBroker
+ * @package    Helmich\EventBroker
  * @subpackage Broker
  *
  * @Flow\Scope("singleton")

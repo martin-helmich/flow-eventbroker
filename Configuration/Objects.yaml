@@ -1,4 +1,4 @@
-Mw\EventBroker\Broker\Broker:
+Helmich\EventBroker\Broker\Broker:
   properties:
     cache:
       object:
@@ -6,4 +6,4 @@ Mw\EventBroker\Broker\Broker:
         factoryMethodName: getCache
         arguments:
           1:
-            value: Mw_EventBroker_Broker_DispatcherCache
+            value: Helmich_EventBroker_Broker_DispatcherCache
