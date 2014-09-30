@@ -53,7 +53,7 @@ class Broker implements BrokerInterface
 
 
     /**
-     * @var array
+     * @var \SplQueue
      */
     private $queue = [];
 
@@ -69,6 +69,8 @@ class Broker implements BrokerInterface
 
     public function initializeObject()
     {
+        $this->queue = new \SplQueue();
+
         $this->synchronousEventMap  = $this->cache->get('DispatcherConfiguration_Synchronous');
         $this->asynchronousEventMap = $this->cache->get('DispatcherConfiguration_Asynchronous');
 
@@ -91,9 +93,9 @@ class Broker implements BrokerInterface
      */
     public function queueEvent($event)
     {
-        $this->queue[] = $event;
-        $class         = get_class($event);
+        $this->queue->enqueue($event);
 
+        $class = get_class($event);
         foreach ($this->synchronousEventMap->getListenersForEvent($class) as $listener)
         {
             list($listenerClass, $method) = $listener;
@@ -112,6 +114,8 @@ class Broker implements BrokerInterface
      */
     public function flush()
     {
+        $this->queue->setIteratorMode(\SplQueue::IT_MODE_DELETE);
+
         foreach ($this->queue as $event)
         {
             $class = get_class($event);
