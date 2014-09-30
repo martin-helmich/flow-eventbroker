@@ -98,10 +98,7 @@ class Broker implements BrokerInterface
         $class = get_class($event);
         foreach ($this->synchronousEventMap->getListenersForEvent($class) as $listener)
         {
-            list($listenerClass, $method) = $listener;
-
-            $listenerInstance = $this->objectManager->get($listenerClass);
-            $listenerInstance->{$method}($event);
+            $this->invokeListener($listener, $event);
         }
     }
 
@@ -122,11 +119,34 @@ class Broker implements BrokerInterface
 
             foreach ($this->asynchronousEventMap->getListenersForEvent($class) as $listener)
             {
-                list($listenerClass, $method) = $listener;
-
-                $listenerInstance = $this->objectManager->get($listenerClass);
-                $listenerInstance->{$method}($event);
+                $this->invokeListener($listener, $event);
             }
+        }
+    }
+
+
+
+    /**
+     * Invokes a listener for an event.
+     *
+     * @param callable $listener Any type of callable.
+     * @param object   $event    The event object.
+     * @return void
+     *
+     * @throws UnknownObjectException May be thrown when the listener class cannot be instantiated.
+     */
+    private function invokeListener($listener, $event)
+    {
+        if (is_array($listener))
+        {
+            list($listenerClass, $method) = $listener;
+
+            $listenerInstance = $this->objectManager->get($listenerClass);
+            $listenerInstance->{$method}($event);
+        }
+        else
+        {
+            call_user_func($listener, $event);
         }
     }
 
@@ -140,6 +160,7 @@ class Broker implements BrokerInterface
         $this->synchronousEventMap  = new EventMapping();
         $this->asynchronousEventMap = new EventMapping();
 
+        $eventMap       = NULL;
         $annotationName = 'Helmich\\EventBroker\\Annotations\\Listener';
 
         $classes = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotationName);
@@ -158,12 +179,20 @@ class Broker implements BrokerInterface
                         $annotationName
                     );
 
-                    $event    = $annotation->event;
-                    $eventMap = $annotation->synchronous ? $this->synchronousEventMap : $this->asynchronousEventMap;
-                    $eventMap->addListenerForEvent($event, [$class, $method->getName()]);
+                    $event = $annotation->event;
+                    $this
+                        ->getEventMap($annotation->synchronous)
+                        ->addListenerForEvent($event, [$class, $method->getName()]);
                 }
             }
         }
+    }
+
+
+
+    private function getEventMap($synchronous)
+    {
+        return $synchronous ? $this->synchronousEventMap : $this->asynchronousEventMap;
     }
 
 
