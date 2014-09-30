@@ -9,6 +9,15 @@ namespace Helmich\EventBroker\Broker;
  *                                                                        */
 
 
+/**
+ * Container class for mapping events to listeners.
+ *
+ * @author     Martin Helmich <typo3@martin-helmich.de>
+ * @package    Helmich\EventBroker
+ * @subpackage Broker
+ *
+ * @package    Helmich\EventBroker\Broker
+ */
 class EventMapping
 {
 
@@ -19,10 +28,21 @@ class EventMapping
     // it will be lost when Flow's proxy subclass is serialized (see [1])!
     //
     //     [1] http://php.net/manual/de/language.oop5.magic.php#76643
+    /**
+     * Map of events to listeners.
+     * @var array
+     */
     protected $eventMap = [];
 
 
 
+    /**
+     * Adds a new listener for an event.
+     *
+     * @param string   $eventClassName The event class name.
+     * @param callable $listener       Any kind of callable.
+     * @return void
+     */
     public function addListenerForEvent($eventClassName, $listener)
     {
         if (FALSE === array_key_exists($eventClassName, $this->eventMap))
@@ -34,6 +54,12 @@ class EventMapping
 
 
 
+    /**
+     * Gets all listeners for an event.
+     *
+     * @param string $eventClassName The event class name.
+     * @return array An array of callables.
+     */
     public function getListenersForEvent($eventClassName)
     {
         if (FALSE === array_key_exists($eventClassName, $this->eventMap))

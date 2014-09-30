@@ -11,6 +11,8 @@ namespace Helmich\EventBroker\Broker;
 
 use Helmich\EventBroker\Annotations\Listener;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
+use TYPO3\Flow\Object\Exception\UnknownObjectException;
 use TYPO3\Flow\Object\ObjectManager;
 use TYPO3\Flow\Reflection\ClassReflection;
 use TYPO3\Flow\Reflection\MethodReflection;
@@ -46,7 +48,7 @@ class Broker implements BrokerInterface
 
 
     /**
-     * @var \TYPO3\Flow\Cache\Frontend\VariableFrontend
+     * @var FrontendInterface
      * @Flow\Inject
      */
     protected $cache;
@@ -67,6 +69,9 @@ class Broker implements BrokerInterface
 
 
 
+    /**
+     * Initializes the broker. Loads the dispatching configuration from cache or builds it.
+     */
     public function initializeObject()
     {
         $this->queue = new \SplQueue();
