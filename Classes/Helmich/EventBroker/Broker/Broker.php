@@ -59,11 +59,11 @@ class Broker implements BrokerInterface
 
 
     /**
-     * @var array
+     * @var EventMapping
      */
     private
-        $synchronousEventMap = [],
-        $asynchronousEventMap = [];
+        $synchronousEventMap,
+        $asynchronousEventMap;
 
 
 
@@ -92,12 +92,9 @@ class Broker implements BrokerInterface
     public function queueEvent($event)
     {
         $this->queue[] = $event;
+        $class         = get_class($event);
 
-        $class     = get_class($event);
-        $listeners = array_key_exists($class, $this->synchronousEventMap)
-            ? $this->synchronousEventMap[$class] : [];
-
-        foreach ($listeners as $listener)
+        foreach ($this->synchronousEventMap->getListenersForEvent($class) as $listener)
         {
             list($listenerClass, $method) = $listener;
 
@@ -117,11 +114,9 @@ class Broker implements BrokerInterface
     {
         foreach ($this->queue as $event)
         {
-            $class     = get_class($event);
-            $listeners = array_key_exists($class, $this->asynchronousEventMap)
-                ? $this->asynchronousEventMap[$class] : [];
+            $class = get_class($event);
 
-            foreach ($listeners as $listener)
+            foreach ($this->asynchronousEventMap->getListenersForEvent($class) as $listener)
             {
                 list($listenerClass, $method) = $listener;
 
@@ -138,7 +133,9 @@ class Broker implements BrokerInterface
      */
     private function buildEventMap()
     {
-        $eventMap       = NULL;
+        $this->synchronousEventMap  = new EventMapping();
+        $this->asynchronousEventMap = new EventMapping();
+
         $annotationName = 'Helmich\\EventBroker\\Annotations\\Listener';
 
         $classes = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotationName);
@@ -157,19 +154,9 @@ class Broker implements BrokerInterface
                         $annotationName
                     );
 
-                    $eventMap &= $this->asynchronousEventMap;
-                    $event = $annotation->event;
-
-                    if ($annotation->synchronous)
-                    {
-                        $eventMap &= $this->synchronousEventMap;
-                    }
-
-                    if (FALSE === array_key_exists($event, $eventMap))
-                    {
-                        $eventMap[$event] = [];
-                    }
-                    $eventMap[$event][] = [$class, $method->getName()];
+                    $event    = $annotation->event;
+                    $eventMap = $annotation->synchronous ? $this->synchronousEventMap : $this->asynchronousEventMap;
+                    $eventMap->addListenerForEvent($event, [$class, $method->getName()]);
                 }
             }
         }
