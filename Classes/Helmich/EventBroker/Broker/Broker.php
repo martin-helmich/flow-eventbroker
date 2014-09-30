@@ -9,7 +9,10 @@ namespace Helmich\EventBroker\Broker;
  *                                                                        */
 
 
+use Helmich\EventBroker\Annotations\Listener;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cache\Frontend\FrontendInterface;
+use TYPO3\Flow\Object\Exception\UnknownObjectException;
 use TYPO3\Flow\Object\ObjectManager;
 use TYPO3\Flow\Reflection\ClassReflection;
 use TYPO3\Flow\Reflection\MethodReflection;
@@ -45,16 +48,45 @@ class Broker implements BrokerInterface
 
 
     /**
-     * @var \TYPO3\Flow\Cache\Frontend\VariableFrontend
+     * @var FrontendInterface
      * @Flow\Inject
      */
     protected $cache;
 
 
     /**
-     * @var array
+     * @var \SplQueue
      */
     private $queue = [];
+
+
+    /**
+     * @var EventMapping
+     */
+    private
+        $synchronousEventMap,
+        $asynchronousEventMap;
+
+
+
+    /**
+     * Initializes the broker. Loads the dispatching configuration from cache or builds it.
+     */
+    public function initializeObject()
+    {
+        $this->queue = new \SplQueue();
+
+        $this->synchronousEventMap  = $this->cache->get('DispatcherConfiguration_Synchronous');
+        $this->asynchronousEventMap = $this->cache->get('DispatcherConfiguration_Asynchronous');
+
+        if (FALSE === ($this->synchronousEventMap || $this->asynchronousEventMap))
+        {
+            $this->buildEventMap();
+
+            $this->cache->set('DispatcherConfiguration_Asynchronous', $this->asynchronousEventMap);
+            $this->cache->set('DispatcherConfiguration_Synchronous', $this->synchronousEventMap);
+        }
+    }
 
 
 
@@ -66,7 +98,13 @@ class Broker implements BrokerInterface
      */
     public function queueEvent($event)
     {
-        $this->queue[] = $event;
+        $this->queue->enqueue($event);
+
+        $class = get_class($event);
+        foreach ($this->synchronousEventMap->getListenersForEvent($class) as $listener)
+        {
+            $this->invokeListener($listener, $event);
+        }
     }
 
 
@@ -78,23 +116,15 @@ class Broker implements BrokerInterface
      */
     public function flush()
     {
-        if (FALSE === ($eventMap = $this->cache->get('DispatcherConfiguration')))
-        {
-            $eventMap = $this->buildEventMap();
-            $this->cache->set('DispatcherConfiguration', $eventMap);
-        }
+        $this->queue->setIteratorMode(\SplQueue::IT_MODE_DELETE);
 
         foreach ($this->queue as $event)
         {
-            $class     = get_class($event);
-            $listeners = array_key_exists($class, $eventMap) ? $eventMap[$class] : [];
+            $class = get_class($event);
 
-            foreach ($listeners as $listener)
+            foreach ($this->asynchronousEventMap->getListenersForEvent($class) as $listener)
             {
-                list($listenerClass, $method) = $listener;
-
-                $listenerInstance = $this->objectManager->get($listenerClass);
-                $listenerInstance->{$method}($event);
+                $this->invokeListener($listener, $event);
             }
         }
     }
@@ -102,16 +132,43 @@ class Broker implements BrokerInterface
 
 
     /**
-     * Builds the event dispatching configuration.
+     * Invokes a listener for an event.
      *
-     * @return array The event dispatching configuration.
+     * @param callable $listener Any type of callable.
+     * @param object   $event    The event object.
+     * @return void
+     *
+     * @throws UnknownObjectException May be thrown when the listener class cannot be instantiated.
+     */
+    private function invokeListener($listener, $event)
+    {
+        if (is_array($listener))
+        {
+            list($listenerClass, $method) = $listener;
+
+            $listenerInstance = $this->objectManager->get($listenerClass);
+            $listenerInstance->{$method}($event);
+        }
+        else
+        {
+            call_user_func($listener, $event);
+        }
+    }
+
+
+
+    /**
+     * Builds the event dispatching configuration.
      */
     private function buildEventMap()
     {
-        $eventMap = [];
+        $this->synchronousEventMap  = new EventMapping();
+        $this->asynchronousEventMap = new EventMapping();
 
+        $eventMap       = NULL;
         $annotationName = 'Helmich\\EventBroker\\Annotations\\Listener';
-        $classes        = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotationName);
+
+        $classes = $this->reflectionService->getClassesContainingMethodsAnnotatedWith($annotationName);
         foreach ($classes as $class)
         {
             $classReflection = new ClassReflection($class);
@@ -120,6 +177,7 @@ class Broker implements BrokerInterface
             {
                 if ($this->reflectionService->isMethodAnnotatedWith($class, $method->getName(), $annotationName))
                 {
+                    /** @var Listener $annotation */
                     $annotation = $this->reflectionService->getMethodAnnotation(
                         $class,
                         $method->getName(),
@@ -127,16 +185,19 @@ class Broker implements BrokerInterface
                     );
 
                     $event = $annotation->event;
-
-                    if (FALSE === array_key_exists($event, $eventMap))
-                    {
-                        $eventMap[$event] = [];
-                    }
-                    $eventMap[$event][] = [$class, $method->getName()];
+                    $this
+                        ->getEventMap($annotation->synchronous)
+                        ->addListenerForEvent($event, [$class, $method->getName()]);
                 }
             }
         }
-        return $eventMap;
+    }
+
+
+
+    private function getEventMap($synchronous)
+    {
+        return $synchronous ? $this->synchronousEventMap : $this->asynchronousEventMap;
     }
 
 

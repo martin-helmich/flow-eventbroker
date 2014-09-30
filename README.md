@@ -59,6 +59,29 @@ The event class to listen for is specified as parameter within the annotation.
         }
     }
 
+### Synchronous and asynchronous events
+
+By defaults, listeners will be called asynchronously. In the default implementation, events
+will be queued and dispatched in an event loop at the end of the main application run (other,
+later implementations might do this completely asynchronously by dispatching events to another
+process).
+
+You can explicitly declare listeners to be processed synchronously (when the event is published)
+by using the "sync" tag in the `@Event\Listener` annotation:
+
+    <?php
+    namespace My\Example;
+
+    use Helmich\EventBroker\Annotations as Event;
+
+    class Listener {
+    
+        /**
+         * @Event\Listener("My\Example\SomeEvent", sync=TRUE)
+         */
+        public function myListener(SomeEvent $event) { }
+    }
+
 To-Do
 -----
 

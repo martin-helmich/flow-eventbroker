@@ -35,6 +35,14 @@ final class Listener
 
 
     /**
+     * Explicitly request synchronous event dispatching.
+     * @var bool
+     */
+    public $synchronous = FALSE;
+
+
+
+    /**
      * Constructs a new annotation.
      *
      * @param array $values Annotation parameters.
@@ -46,6 +54,15 @@ final class Listener
             throw new \InvalidArgumentException('Missing event class name!');
         }
         $this->event = $values['value'];
+
+        if (isset($values['sync']))
+        {
+            $this->synchronous = (bool)$values['sync'];
+        }
+        else if (isset($values['async']))
+        {
+            $this->synchronous = !((bool)$values['async']);
+        }
     }
 
 } 
