@@ -14,7 +14,12 @@ class EventMapping
 
 
 
-    private $eventMap = [];
+    // Fuck it PHP, you really fucking backstabbed me with this!
+    // Visibility actually HAS to be protected (NOT PRIVATE), because otherwise
+    // it will be lost when Flow's proxy subclass is serialized (see [1])!
+    //
+    //     [1] http://php.net/manual/de/language.oop5.magic.php#76643
+    protected $eventMap = [];
 
 
 
