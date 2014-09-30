@@ -92,6 +92,18 @@ class Broker implements BrokerInterface
     public function queueEvent($event)
     {
         $this->queue[] = $event;
+
+        $class     = get_class($event);
+        $listeners = array_key_exists($class, $this->synchronousEventMap)
+            ? $this->synchronousEventMap[$class] : [];
+
+        foreach ($listeners as $listener)
+        {
+            list($listenerClass, $method) = $listener;
+
+            $listenerInstance = $this->objectManager->get($listenerClass);
+            $listenerInstance->{$method}($event);
+        }
     }
 
 
